@@ -121,7 +121,7 @@ The dashboard automatically plays the Adhan audio file when the current device t
 - **Backend**: Node.js, Express.js
 - **API**: AlAdhan Islamic Network API
 - **Styling**: Custom CSS with modern design patterns
-- **Audio**: HTML5 Audio API
+- **Audio**: HTML5 Audio
 
 ## 🌍 Supported Locations
 
