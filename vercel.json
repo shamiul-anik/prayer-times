@@ -1,0 +1,11 @@
+{
+  "buildCommand": "echo 'Build complete'",
+  "devCommand": "node server.js",
+  "installCommand": "npm install",
+  "env": {},
+  "functions": {
+    "server.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
