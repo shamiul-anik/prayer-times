@@ -53,3 +53,7 @@ build/
 
 # Testing
 .mocha_output
+
+# MD FILES TO IGNORE
+SECURITY_AND_DESIGN_UPDATES.md
+VERCEL_DEPLOYMENT.md

@@ -1,6 +1,6 @@
 # 🕌 Prayer Times Dashboard
 
-A beautiful, responsive web dashboard for displaying Islamic prayer times with automatic Adhan (call to prayer) playback. Built with vanilla JavaScript and modern CSS, featuring real-time updates and support for different Islamic juristic schools.
+A simple and modern, responsive web dashboard for displaying Islamic prayer times with automatic Adhan (call to prayer) playback. Built with vanilla JavaScript and modern CSS, featuring real-time updates and support for different Islamic juristic schools.
 
 ## 🌟 Features
 
@@ -17,7 +17,7 @@ A beautiful, responsive web dashboard for displaying Islamic prayer times with a
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v14 or higher)
+- Node.js (v22 or higher)
 - npm
 
 ### Installation
@@ -70,7 +70,7 @@ prayer-time/
 
 The application uses the **Aladhan API** to fetch accurate prayer times:
 - **API Endpoint**: `https://api.aladhan.com/v1/`
-- **Documentation**: [Aladhan API](https://aladhan.com/api-details)
+- **Documentation**: [Aladhan API](https://aladhan.com/prayer-times-api)
 
 ### Backend API Endpoints
 
@@ -119,19 +119,17 @@ The dashboard automatically plays the Adhan audio file when the current device t
 
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript (ES6+)
 - **Backend**: Node.js, Express.js
-- **API**: Aladhan Islamic Network API
+- **API**: AlAdhan Islamic Network API
 - **Styling**: Custom CSS with modern design patterns
 - **Audio**: HTML5 Audio API
 
 ## 🌍 Supported Locations
 
-The application supports any city/country combination that Aladhan API provides data for. Popular locations include:
+The application supports any city/country combination that AlAdhan API provides data for. Popular locations include:
 
 - **Japan**: Osaka, Tokyo
 - **Middle East**: Dubai, Istanbul, Cairo, Medina, Mecca
-- **Europe**: London, Paris, Berlin
-- **North America**: New York, Toronto, Los Angeles
-- And many more...
+- **Europe**: London
 
 ## 📝 Prayer Times Information
 
@@ -150,16 +148,17 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+This project is open source and available under the GNU GENERAL PUBLIC LICENSE v3.0
 
 ## 👨‍💻 Author
 
-**Shamiul** - [Portfolio](https://shamiul.netlify.app/)
+**A K M Shamiul Islam** 
+- [Portfolio](https://shamiul.netlify.app/)
+- [LinkedIn](https://www.linkedin.com/in/anikbd/)
 
 ## 🙏 Credits
 
 - Prayer times data provided by [Aladhan - Islamic Network](https://aladhan.com/)
-- Inspired by the Adhan Player interface
 
 ## 📧 Contact
 
