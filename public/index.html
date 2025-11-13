@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prayer Times Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🕌</text></svg>">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>🕌 Prayer Times</h1>
+      <!-- <p class="subtitle" id="locationInfo">Loading...</p>
+      <p class="dates" id="dateInfo"></p> -->
+    </header>
+
+    <!-- Controls Section -->
+    <section class="controls-section">
+      <div class="controls-group">
+        <div class="control-item">
+          <label for="citySelect">City</label>
+          <select id="citySelect">
+            <option value="Osaka">Osaka</option>
+            <option value="Tokyo">Tokyo</option>
+            <!-- <option value="London">London</option>
+            <option value="Dubai">Dubai</option>
+            <option value="Istanbul">Istanbul</option>
+            <option value="Cairo">Cairo</option>
+            <option value="Medina">Medina</option>
+            <option value="Mecca">Mecca</option> -->
+          </select>
+        </div>
+
+        <div class="control-item">
+          <label for="countrySelect">Country</label>
+          <select id="countrySelect">
+            <option value="Japan">Japan</option>
+            <!-- <option value="UK">UK</option>
+            <option value="UAE">UAE</option>
+            <option value="Turkey">Turkey</option>
+            <option value="Egypt">Egypt</option>
+            <option value="Saudi Arabia">Saudi Arabia</option> -->
+          </select>
+        </div>
+
+        <div class="control-item">
+          <label for="schoolSelect">Juristic School</label>
+          <select id="schoolSelect">
+            <option value="1">Hanafi</option>
+            <option value="0">Shafi, Hanbali, Maliki, Shia and all others</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prayer Times Grid -->
+    <section class="prayer-section">
+      <div id="prayerTimesContainer" class="prayer-grid">
+        <div class="prayer-card loading">
+          <p>Loading prayer times...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Next Prayer Alert -->
+    <section class="next-prayer-section">
+      <h2>⏰ Next Prayer</h2>
+      <div id="nextPrayerContainer" class="next-prayer-card">
+        <div class="loading-spinner">
+          <p>Loading...</p>
+        </div>
+      </div>
+      <div class="current-time" id="currentTime">00:00:00</div>
+    </section>
+
+    <!-- Adhan Player -->
+    <section class="adhan-section">
+      <div id="adhanStatus" class="adhan-status">
+        Ready to play Adhan automatically
+      </div>
+      <audio id="adhanAudio" preload="auto">
+        <source src="/audio/a1.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Created by <strong><a href="https://shamiul.netlify.app/" target="_blank">Shamiul</a></strong></p>
+      <p>Prayer Times API Provided by <a href="https://aladhan.com/" target="_blank" rel="noopener noreferrer">Islamic Network</a></p>
+      <p><a href="https://github.com/shamiul-anik/prayer-times.git" target="_blank" rel="noopener noreferrer">🔗 GitHub Repository</a></p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
