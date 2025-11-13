@@ -5,7 +5,7 @@
   "env": {},
   "functions": {
     "server.js": {
-      "runtime": "nodejs18.x"
+      "runtime": "nodejs22.x"
     }
   }
 }
