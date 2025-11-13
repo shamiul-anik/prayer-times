@@ -13,6 +13,13 @@ const adhanStatus = document.getElementById('adhanStatus');
 let currentPrayerTimes = {};
 let lastPlayedPrayer = null;
 
+// Utility function to escape HTML
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 // Event Listeners
 citySelect.addEventListener('change', loadPrayerTimes);
 countrySelect.addEventListener('change', loadPrayerTimes);
@@ -43,9 +50,9 @@ function updateClock() {
   checkPrayerTime();
 }
 
-// Auto refresh prayer times every second
+// Auto refresh prayer times every 5 minutes (300000 ms)
 function startAutoRefresh() {
-  setInterval(loadPrayerTimes, 1000);
+  setInterval(loadPrayerTimes, 300000);
 }
 
 // Load prayer times based on selected values
@@ -97,9 +104,9 @@ function displayPrayerTimes(data) {
   
   const html = prayers.map(prayer => `
     <div class="prayer-card ${nextPrayer && nextPrayer.name === prayer.name ? 'active' : ''}">
-      <h3 class="prayer-name">${prayer.name}</h3>
-      <p class="prayer-ar">${prayer.ar}</p>
-      <div class="prayer-time">${prayer.time}</div>
+      <h3 class="prayer-name">${escapeHtml(prayer.name)}</h3>
+      <p class="prayer-ar">${escapeHtml(prayer.ar)}</p>
+      <div class="prayer-time">${escapeHtml(prayer.time)}</div>
     </div>
   `).join('');
 
@@ -116,11 +123,11 @@ function displayNextPrayer(data) {
     const html = `
       <div class="next-prayer-content">
         <div class="next-prayer-label">Upcoming Prayer</div>
-        <div class="next-prayer-name">${nextPrayer.name}</div>
-        <div class="next-prayer-ar">${nextPrayer.ar}</div>
-        <div class="next-prayer-time">${nextPrayer.time}</div>
+        <div class="next-prayer-name">${escapeHtml(nextPrayer.name)}</div>
+        <div class="next-prayer-ar">${escapeHtml(nextPrayer.ar)}</div>
+        <div class="next-prayer-time">${escapeHtml(nextPrayer.time)}</div>
         <div class="time-remaining">
-          <span>${timeRemaining}</span>
+          <span>${escapeHtml(timeRemaining)}</span>
         </div>
       </div>
     `;
@@ -214,5 +221,5 @@ function updateAdhanStatus(message) {
 
 // Show error message
 function showError(container, message) {
-  container.innerHTML = `<div class="error">${message}</div>`;
+  container.innerHTML = `<div class="error">${escapeHtml(message)}</div>`;
 }
