@@ -64,7 +64,6 @@ async function loadPrayerTimes() {
 
     const response = await fetch(`/api/prayer-times?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&school=${school}`);
     const data = await response.json();
-    
     if (data.success) {
       currentPrayerTimes = data;
       displayPrayerTimes(data);
@@ -91,8 +90,8 @@ function updateLocationInfo(data) {
 function updateDateInfo(data) {
   if (dateInfo) {
     dateInfo.innerHTML = `
-      <div>${data.gregorianDate} AD</div>
-      <div>${data.hijriDate} AH</div>
+    <div>${data.gregorianDate.weekday.en}, ${data.gregorianDate.month.en} ${data.gregorianDate.day}, ${data.gregorianDate.year} [${data.gregorianDate.date} AD]</div>
+    <div>${data.hijriDate.weekday.en} (${data.hijriDate.weekday.ar}), ${data.hijriDate.day} ${data.hijriDate.month.en} (${data.hijriDate.month.ar}), ${data.hijriDate.year} [${data.hijriDate.date} AH]</div>
     `;
   }
 }

@@ -44,8 +44,8 @@ app.get('/api/prayer-times', async (req, res) => {
       school: schoolName,
       schoolValue: parseInt(school),
       date: data.date.gregorian.date,
-      gregorianDate: data.date.gregorian.format,
-      hijriDate: data.date.hijri.format,
+      gregorianDate: data.date.gregorian,
+      hijriDate: data.date.hijri,
       prayers: prayers,
       timezone: data.meta.timezone,
       timestamp: new Date().toISOString()
