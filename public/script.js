@@ -69,7 +69,7 @@ async function loadPrayerTimes() {
       currentPrayerTimes = data;
       displayPrayerTimes(data);
       displayNextPrayer(data);
-      // updateDateInfo(data);
+      updateDateInfo(data);
       updateLocationInfo(data);
     } else {
       showError(prayerTimesContainer, data.error || 'Failed to load prayer times');

@@ -1,7 +1,7 @@
 .git
 .gitignore
 README.md
-SECURITY_AND_DESIGN_UPDATES.md
 .env.local
 .env.*.local
 node_modules
+backup
