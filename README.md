@@ -1,6 +1,6 @@
-# 🕌 Prayer Times Dashboard
+# 🕌 Prayer Times
 
-A simple and modern, responsive web dashboard for displaying Islamic prayer times with automatic Adhan (call to prayer) playback. Built with vanilla JavaScript and modern CSS, featuring real-time updates and support for different Islamic juristic schools.
+A simple and responsive Islamic Prayer Time Dashboard built with Express.js, Node.js, and vanilla JavaScript, designed to display accurate prayer times using a live API. The dashboard automatically plays the Adhan (call to prayer) at each prayer time and updates in real time. It features clean, modern UI styling with HTML5/CSS3, supports multiple Islamic juristic schools (madhabs), and is optimized for fast global access with Vercel deployment.
 
 ## 🌟 Features
 
