@@ -50,9 +50,9 @@ function updateClock() {
   checkPrayerTime();
 }
 
-// Auto refresh prayer times every 5 minutes (300000 ms)
+// Auto refresh prayer times every 12 hours (43200000 ms)
 function startAutoRefresh() {
-  setInterval(loadPrayerTimes, 300000);
+  setInterval(loadPrayerTimes, 43200000);
 }
 
 // Load prayer times based on selected values
