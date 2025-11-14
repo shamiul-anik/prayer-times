@@ -64,6 +64,7 @@ async function loadPrayerTimes() {
 
     const response = await fetch(`/api/prayer-times?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&school=${school}`);
     const data = await response.json();
+    console.log(data);
     if (data.success) {
       currentPrayerTimes = data;
       displayPrayerTimes(data);
