@@ -1,5 +1,5 @@
 {
   "buildCommand": "echo 'Build complete'",
-  "devCommand": "node index.js",
+  "devCommand": "node server.js",
   "installCommand": "npm install"
 }
