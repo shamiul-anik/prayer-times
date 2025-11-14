@@ -33,6 +33,7 @@ export default async function handler(req, res) {
 
     res.json({
       success: true,
+      test: data,
       city,
       country,
       school: schoolName,
