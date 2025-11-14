@@ -39,6 +39,7 @@ app.get('/api/prayer-times', async (req, res) => {
 
     res.json({
       success: true,
+      data,
       city,
       country,
       school: schoolName,
