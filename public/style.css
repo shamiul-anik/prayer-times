@@ -364,6 +364,10 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .header {
+    margin-bottom: 15px;
+  }
+
   .header h1 {
     font-size: 2.5em;
   }
@@ -399,12 +403,16 @@ body {
     padding: 10px;
   }
 
+  .header {
+    margin-bottom: 5px;
+  }
+
   .header h1 {
-    font-size: 1.5em;
+    font-size: 2.2em;
   }
 
   .header .dates {
-    font-size: 0.85em;
+    font-size: 0.8em;
   }
 
   .controls-section {
