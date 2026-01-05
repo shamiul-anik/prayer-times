@@ -6,6 +6,10 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Content-Type,Date,X-Api-Version');
+  
+  // Cache headers - cache for 12 hours
+  res.setHeader('Cache-Control', 'public, max-age=43200');
+  res.setHeader('Content-Type', 'application/json');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -16,7 +20,8 @@ export default async function handler(req, res) {
     const { city = 'Osaka', country = 'Japan', method = 3, school = 1 } = req.query;
     const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${method}&school=${school}`;
     
-    const response = await axios.get(url);
+    // Add timeout to external API request
+    const response = await axios.get(url, { timeout: 5000 });
     const data = response.data.data;
     const timings = data.timings;
 

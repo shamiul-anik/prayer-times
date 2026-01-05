@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Prayer Times Dashboard - Get accurate prayer times for your location with automatic Adhan notifications and Gregorian and Hijri calendar support.">
   <meta name="theme-color" content="#1b4332">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Prayer Times">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="msapplication-TileColor" content="#1b4332">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
   <title>Prayer Times Dashboard</title>
   <link rel="preload" href="style.css" as="style">
   <link rel="preload" href="script.js" as="script">
@@ -22,7 +29,7 @@
 
     <!-- Controls Section -->
     <section class="controls-section">
-      <h2>Select Your Location</h2>
+      <!-- <h2>Select Your Location</h2> -->
       <div class="controls-group">
         <div class="control-item">
           <label for="citySelect">City</label>
@@ -100,5 +107,6 @@
   </div>
 
   <script src="script.js"></script>
+  <script src="pwa.js"></script>
 </body>
 </html>

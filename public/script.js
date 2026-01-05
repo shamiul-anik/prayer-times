@@ -62,12 +62,40 @@ async function loadPrayerTimes() {
     const country = countrySelect.value;
     const school = schoolSelect.value;
 
+    // Show loading state
+    showLoadingState();
+
+    // Try to use cached data first
+    const cacheKey = `prayer-times-${city}-${country}-${school}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    const cachedTime = localStorage.getItem(cacheKey + '-time');
+    
+    // Use cache if it's less than 12 hours old
+    if (cachedData && cachedTime) {
+      const age = Date.now() - parseInt(cachedTime);
+      if (age < 12 * 60 * 60 * 1000) {
+        const data = JSON.parse(cachedData);
+        currentPrayerTimes = data;
+        displayPrayerTimes(data);
+        displayNextPrayer(data);
+        updateDateInfo(data);
+        updateLocationInfo(data);
+        
+        // Fetch fresh data in background without blocking UI
+        fetchPrayerTimesInBackground(city, country, school, cacheKey);
+        return;
+      }
+    }
+
+    // No valid cache, fetch from API
     const response = await fetch(`/api/prayer-times?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&school=${school}`);
     const data = await response.json();
     
-    console.log(data.test); // For Checking the API Response
-    
     if (data.success) {
+      // Cache the data
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheKey + '-time', Date.now().toString());
+      
       currentPrayerTimes = data;
       displayPrayerTimes(data);
       displayNextPrayer(data);
@@ -78,7 +106,53 @@ async function loadPrayerTimes() {
     }
   } catch (error) {
     console.error('Error loading prayer times:', error);
-    showError(prayerTimesContainer, 'Error fetching prayer times. Please try again.');
+    
+    // Try to show cached data if network fails
+    const city = citySelect.value;
+    const country = countrySelect.value;
+    const school = schoolSelect.value;
+    const cacheKey = `prayer-times-${city}-${country}-${school}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    
+    if (cachedData) {
+      const data = JSON.parse(cachedData);
+      currentPrayerTimes = data;
+      displayPrayerTimes(data);
+      displayNextPrayer(data);
+      updateDateInfo(data);
+      updateLocationInfo(data);
+    } else {
+      showError(prayerTimesContainer, 'Error fetching prayer times. Please check your connection.');
+    }
+  }
+}
+
+// Fetch prayer times in background without blocking UI
+async function fetchPrayerTimesInBackground(city, country, school, cacheKey) {
+  try {
+    const response = await fetch(`/api/prayer-times?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&school=${school}`);
+    const data = await response.json();
+    
+    if (data.success) {
+      // Update cache
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      localStorage.setItem(cacheKey + '-time', Date.now().toString());
+    }
+  } catch (error) {
+    console.error('Background fetch error:', error);
+    // Silent fail - we already have cached data
+  }
+}
+
+// Show loading state
+function showLoadingState() {
+  if (prayerTimesContainer) {
+    prayerTimesContainer.innerHTML = `
+      <div style="text-align: center; padding: 30px;">
+        <div style="font-size: 24px; margin-bottom: 15px;">⏳</div>
+        <p>Loading prayer times...</p>
+      </div>
+    `;
   }
 }
 
@@ -205,9 +279,19 @@ function playAdhan(prayer) {
     adhanAudio.play().then(() => {
       updateAdhanStatus(`Playing Adhan for ${prayer.name} - ${prayer.time}`);
       console.log(`Adhan playing for ${prayer.name}`);
+      
+      // Send PWA notification
+      if (window.pwaInstance) {
+        window.pwaInstance.showPrayerNotification(prayer);
+      }
     }).catch(error => {
       console.error('Error playing Adhan:', error);
       updateAdhanStatus(`Ready to play Adhan for ${prayer.name}`);
+      
+      // Still send notification even if audio fails
+      if (window.pwaInstance) {
+        window.pwaInstance.showPrayerNotification(prayer);
+      }
     });
   } catch (error) {
     console.error('Error playing audio:', error);

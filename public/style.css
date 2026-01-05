@@ -259,7 +259,8 @@ body {
 
 .current-time {
   text-align: center;
-  font-size: 1.2em;
+  font-size: 2em;
+  font-weight: 800;
   color: var(--text-secondary);
   font-family: 'Courier New', monospace;
   padding: 10px;
