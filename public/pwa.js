@@ -19,6 +19,49 @@ class PrayerTimesPWA {
     
     // Install prompt
     this.handleInstallPrompt();
+    
+    // Manage cache cleanup
+    this.initializeCacheManagement();
+  }
+
+  // Initialize cache management
+  initializeCacheManagement() {
+    // Clear old cache immediately on startup
+    this.cleanupOldCache();
+    
+    // Schedule cleanup every hour
+    setInterval(() => this.cleanupOldCache(), 60 * 60 * 1000);
+  }
+
+  // Clean up old cache entries from previous days
+  cleanupOldCache() {
+    const today = new Date().toISOString().split('T')[0];
+    const keysToDelete = [];
+    
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('prayer-times-')) {
+          // Extract date from cache key (format: prayer-times-city-country-school-YYYY-MM-DD)
+          const parts = key.split('-');
+          const cacheDate = parts.slice(-3).join('-');
+          
+          if (cacheDate !== today) {
+            keysToDelete.push(key);
+          }
+        }
+      }
+      
+      keysToDelete.forEach(key => {
+        localStorage.removeItem(key);
+      });
+      
+      if (keysToDelete.length > 0) {
+        console.log(`✓ PWA: Cleared ${keysToDelete.length} old cache entries`);
+      }
+    } catch (error) {
+      console.error('Error during cache cleanup:', error);
+    }
   }
 
   // Register Service Worker
@@ -113,8 +156,11 @@ class PrayerTimesPWA {
 
     this.lastNotifiedPrayer = prayer.name;
 
+    // Format the time based on user preference
+    const formattedTime = this.formatPrayerTime(prayer.time);
+
     const notificationOptions = {
-      body: `It's time for ${prayer.name} prayer at ${prayer.time}`,
+      body: `It's time for ${prayer.name} prayer at ${formattedTime}`,
       icon: '/icons/icon-192x192.png',
       badge: '/icons/icon-72x72.png',
       tag: 'prayer-time',
@@ -123,7 +169,8 @@ class PrayerTimesPWA {
       data: {
         dateOfArrival: Date.now(),
         prayer: prayer.name,
-        time: prayer.time
+        time: prayer.time,
+        formattedTime: formattedTime
       },
       actions: [
         {
@@ -138,6 +185,21 @@ class PrayerTimesPWA {
     };
 
     this.swRegistration.showNotification(`🕌 ${prayer.name} Prayer Time`, notificationOptions);
+  }
+
+  // Format prayer time based on user preference
+  formatPrayerTime(time24) {
+    const timingSelect = document.getElementById('timingSelect');
+    const format = timingSelect ? timingSelect.value : '24';
+    
+    const [hours, minutes] = time24.split(':').map(Number);
+
+    if (format === '12') {
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const hour12 = hours % 12 || 12;
+      return `${String(hour12).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`;
+    }
+    return time24; // 24-hour format
   }
 
   // Handle Service Worker updates

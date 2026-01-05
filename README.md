@@ -7,6 +7,7 @@ A simple and responsive Islamic Prayer Time Dashboard built with Express.js, Nod
 ### Core Features
 - **Real-time Prayer Times**: Displays accurate prayer times for multiple cities worldwide
 - **Multiple Juristic Schools**: Support for Hanafi and Shafi juristic schools
+- **12/24 Hour Format Toggle**: Switch between 12-hour and 24-hour time display (NEW!)
 - **Auto-refresh**: Updates prayer times every second for real-time accuracy
 - **Automatic Adhan Playback**: Automatically plays Adhan audio when prayer time arrives
 - **Next Prayer Countdown**: Shows time remaining until the next prayer with live countdown
@@ -23,6 +24,7 @@ A simple and responsive Islamic Prayer Time Dashboard built with Express.js, Nod
 - **⚡ Fast Loading**: Service Worker caching for instant app load
 - **🏠 Home Screen**: Launch directly from your device's home screen like a native app
 - **✨ Native-like Experience**: Fullscreen, standalone app experience without browser UI
+- **⏱️ Time Format Preferences**: Notifications respect your 12/24 hour format choice (NEW!)
 
 ## 🚀 Quick Start
 
@@ -136,9 +138,10 @@ prayer-times/
 
 1. **Select Location**: Choose your city and country from the dropdown menus
 2. **Choose School**: Select between Hanafi (default) or Shafi juristic school
-3. **View Prayer Times**: All five daily prayers are displayed with times
-4. **Monitor Next Prayer**: The next prayer countdown shows time remaining
-5. **Automatic Playback**: Adhan will automatically play when prayer time arrives
+3. **Choose Time Format**: Toggle between 12-hour and 24-hour time display (NEW!)
+4. **View Prayer Times**: All five daily prayers are displayed with times in your preferred format
+5. **Monitor Next Prayer**: The next prayer countdown shows time remaining
+6. **Automatic Playback**: Adhan will automatically play when prayer time arrives
 
 ### PWA Features
 
@@ -148,8 +151,11 @@ prayer-times/
   - One-click installation process
 - **Offline Usage**: App works without internet with cached prayer times
 - **Notifications**: Get prayer time alerts even when the app is closed
+  - Notifications display time in your selected format (12/24 hour)
 - **Background Updates**: Data syncs automatically in the background
 - **Smart Caching**: Lightning-fast load times with intelligent local storage
+  - Daily cache refresh ensures always-current prayer times
+  - Old cache entries automatically cleaned up
 
 ---
 
@@ -286,34 +292,39 @@ See `vercel.json` for deployment configuration.
 The app implements intelligent caching for lightning-fast performance:
 
 **Client-Side Caching (LocalStorage)**
-- Prayer times are cached for **12 hours** per location
+- Prayer times are cached **daily per location** with automatic refresh
+- Timing format preference is saved and persists across sessions
 - Instant display on subsequent loads
 - Background refresh without blocking UI
 - Automatic fallback if network is unavailable
+- Old cache entries automatically cleaned up hourly
 
 **Server-Side Caching**
-- API responses cached with 12-hour expiration
+- API responses cached with intelligent expiration
 - Reduces calls to external Aladhan API
 - Faster response times on production
 
 **Network Optimization**
-- 5-second timeout on external API calls
 - Service Worker caches static assets
 - Network-first strategy for API calls
 - Cache-first strategy for static files
+- Validates cached data before use
 
 **Result:**
 - ⚡ First load: ~2-5 seconds (external API)
 - 🚀 Subsequent loads: **Instant** (uses cache)
 - 📴 Offline: Shows last cached prayer times
 - 🔄 Background updates: Fresh data fetches silently
+- ⏱️ Time format persists: Your 12/24 hour preference is remembered
 
 ### How It Works
 
 1. **App loads** → Shows cached data instantly if available
 2. **Fetches fresh data** → Updates cache in background
 3. **User switches cities** → New cached data displays immediately
-4. **Network unavailable** → Falls back to latest cached data
+4. **User changes time format** → All times update and preference is saved
+5. **Network unavailable** → Falls back to latest cached data
+6. **Daily automatic cleanup** → Old cache entries removed automatically
 
 This approach ensures the app always feels fast and responsive!
 
@@ -375,6 +386,30 @@ The Prayer Times dashboard is optimized for mobile devices:
 
 ---
 
+## 📝 Recent Updates (January 2026)
+
+### ✨ New Features
+- **Time Format Selection** - Toggle between 12-hour and 24-hour prayer time display
+  - Setting persists across page reloads using localStorage
+  - Notifications respect your time format preference
+  - All prayer times update instantly when format changes
+
+### 🐛 Bug Fixes & Improvements
+- **Fixed caching issues** - Implemented date-based cache keys for daily refresh
+- **Improved cache management** - Automatic cleanup of old cache entries every hour
+- **Enhanced background fetch** - Better validation and comparison of cached data
+- **Fixed timing control visibility** - Updated Service Worker cache version (v1 → v2)
+- **Better error handling** - Null checks and graceful fallbacks for all DOM elements
+- **PWA cache updates** - Added cache cleanup to PWA initialization
+
+### 🔄 Cache System Improvements
+- **Daily refresh**: Cache keys now include date (YYYY-MM-DD) for automatic daily reset
+- **Intelligent updates**: Only updates cache when data actually changes
+- **Automatic cleanup**: Removes old cache entries hourly
+- **Better validation**: Verifies cached data structure before use
+
+---
+
 ## 📝 Prayer Times Information
 
 The dashboard displays the following prayers:
@@ -425,6 +460,6 @@ For questions, suggestions, or bug reports:
 
 **Note:** This dashboard requires an active internet connection to fetch prayer times from the Aladhan API on first load. Once cached, it works offline. Audio playback may require user interaction on some browsers due to autoplay policies.
 
-**Last Updated:** January 2026
-**Version:** 1.0 (with Progressive Web App support)
+**Last Updated:** January 5, 2026
+**Version:** 1.1 (with Time Format Selection, Improved Caching, and Bug Fixes)
 

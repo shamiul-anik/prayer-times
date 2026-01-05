@@ -1,10 +1,11 @@
 // Service Worker for Prayer Times PWA
-const CACHE_NAME = 'prayer-times-v1';
+const CACHE_NAME = 'prayer-times-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/style.css',
   '/script.js',
+  '/pwa.js',
   '/manifest.json',
   '/audio/a1.mp3'
 ];

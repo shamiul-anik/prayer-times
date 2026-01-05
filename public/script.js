@@ -2,6 +2,7 @@
 const citySelect = document.getElementById('citySelect');
 const countrySelect = document.getElementById('countrySelect');
 const schoolSelect = document.getElementById('schoolSelect');
+const timingSelect = document.getElementById('timingSelect');
 const prayerTimesContainer = document.getElementById('prayerTimesContainer');
 const nextPrayerContainer = document.getElementById('nextPrayerContainer');
 const locationInfo = document.getElementById('locationInfo');
@@ -13,6 +14,12 @@ const adhanStatus = document.getElementById('adhanStatus');
 let currentPrayerTimes = {};
 let lastPlayedPrayer = null;
 
+// Get cache key with date to ensure daily refresh
+function getCacheKey(city, country, school) {
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  return `prayer-times-${city}-${country}-${school}-${today}`;
+}
+
 // Utility function to escape HTML
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -20,12 +27,43 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// Utility function to format time based on selected format
+function formatTime(time24) {
+  const format = timingSelect && timingSelect.value ? timingSelect.value : '24';
+  const [hours, minutes] = time24.split(':').map(Number);
+
+  if (format === '12') {
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hour12 = hours % 12 || 12;
+    return `${String(hour12).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`;
+  }
+  return time24; // 24-hour format
+}
+
 // Event Listeners
 citySelect.addEventListener('change', loadPrayerTimes);
 countrySelect.addEventListener('change', loadPrayerTimes);
 schoolSelect.addEventListener('change', loadPrayerTimes);
 
+// Add event listener for timing select if element exists
+if (timingSelect) {
+  timingSelect.addEventListener('change', () => {
+    // Save timing preference to localStorage
+    localStorage.setItem('prayer-times-timing', timingSelect.value);
+    
+    if (Object.keys(currentPrayerTimes).length > 0) {
+      displayPrayerTimes(currentPrayerTimes);
+      displayNextPrayer(currentPrayerTimes);
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  // Restore timing preference from localStorage
+  if (timingSelect && localStorage.getItem('prayer-times-timing')) {
+    timingSelect.value = localStorage.getItem('prayer-times-timing');
+  }
+  
   loadPrayerTimes();
   startClockUpdate();
   startAutoRefresh();
@@ -50,9 +88,41 @@ function updateClock() {
   checkPrayerTime();
 }
 
+// Clear old cache entries (from previous days)
+function clearOldCache() {
+  const today = new Date().toISOString().split('T')[0];
+  const keysToDelete = [];
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('prayer-times-')) {
+      // Extract date from cache key (format: prayer-times-city-country-school-YYYY-MM-DD)
+      const parts = key.split('-');
+      const cacheDate = parts.slice(-3).join('-'); // Get last 3 parts (YYYY-MM-DD)
+      
+      if (cacheDate !== today) {
+        keysToDelete.push(key);
+      }
+    }
+  }
+  
+  keysToDelete.forEach(key => {
+    localStorage.removeItem(key);
+  });
+  
+  if (keysToDelete.length > 0) {
+    console.log(`✓ Cleared ${keysToDelete.length} old cache entries`);
+  }
+}
+
 // Auto refresh prayer times every 12 hours (43200000 ms)
 function startAutoRefresh() {
-  setInterval(loadPrayerTimes, 43200000);
+  // Clear old cache immediately and then every hour
+  clearOldCache();
+  setInterval(clearOldCache, 60 * 60 * 1000); // Every hour
+  
+  // Refresh prayer times every 12 hours
+  setInterval(loadPrayerTimes, 12 * 60 * 60 * 1000);
 }
 
 // Load prayer times based on selected values
@@ -66,24 +136,27 @@ async function loadPrayerTimes() {
     showLoadingState();
 
     // Try to use cached data first
-    const cacheKey = `prayer-times-${city}-${country}-${school}`;
+    const cacheKey = getCacheKey(city, country, school);
     const cachedData = localStorage.getItem(cacheKey);
-    const cachedTime = localStorage.getItem(cacheKey + '-time');
     
-    // Use cache if it's less than 12 hours old
-    if (cachedData && cachedTime) {
-      const age = Date.now() - parseInt(cachedTime);
-      if (age < 12 * 60 * 60 * 1000) {
+    // Use cache if available (cache is daily, so it's always fresh for the current day)
+    if (cachedData) {
+      try {
         const data = JSON.parse(cachedData);
-        currentPrayerTimes = data;
-        displayPrayerTimes(data);
-        displayNextPrayer(data);
-        updateDateInfo(data);
-        updateLocationInfo(data);
-        
-        // Fetch fresh data in background without blocking UI
-        fetchPrayerTimesInBackground(city, country, school, cacheKey);
-        return;
+        if (data && data.prayers && data.prayers.length > 0) {
+          currentPrayerTimes = data;
+          displayPrayerTimes(data);
+          displayNextPrayer(data);
+          updateDateInfo(data);
+          updateLocationInfo(data);
+          
+          // Fetch fresh data in background to keep it updated
+          fetchPrayerTimesInBackground(city, country, school, cacheKey);
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing cached data:', error);
+        // Continue to fetch fresh data
       }
     }
 
@@ -111,7 +184,7 @@ async function loadPrayerTimes() {
     const city = citySelect.value;
     const country = countrySelect.value;
     const school = schoolSelect.value;
-    const cacheKey = `prayer-times-${city}-${country}-${school}`;
+    const cacheKey = getCacheKey(city, country, school);
     const cachedData = localStorage.getItem(cacheKey);
     
     if (cachedData) {
@@ -133,10 +206,26 @@ async function fetchPrayerTimesInBackground(city, country, school, cacheKey) {
     const response = await fetch(`/api/prayer-times?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&school=${school}`);
     const data = await response.json();
     
-    if (data.success) {
-      // Update cache
-      localStorage.setItem(cacheKey, JSON.stringify(data));
-      localStorage.setItem(cacheKey + '-time', Date.now().toString());
+    if (data && data.success && data.prayers && data.prayers.length > 0) {
+      // Validate data before caching
+      const existingCache = localStorage.getItem(cacheKey);
+      const newDataString = JSON.stringify(data);
+      
+      // Only update if we have new/different data
+      if (!existingCache || newDataString !== existingCache) {
+        localStorage.setItem(cacheKey, newDataString);
+        console.log('✓ Prayer times cache updated');
+        
+        // Update current display if data has changed significantly
+        if (existingCache) {
+          const oldData = JSON.parse(existingCache);
+          if (JSON.stringify(oldData.prayers) !== JSON.stringify(data.prayers)) {
+            currentPrayerTimes = data;
+            displayPrayerTimes(data);
+            displayNextPrayer(data);
+          }
+        }
+      }
     }
   } catch (error) {
     console.error('Background fetch error:', error);
@@ -182,7 +271,7 @@ function displayPrayerTimes(data) {
     <div class="prayer-card ${nextPrayer && nextPrayer.name === prayer.name ? 'active' : ''}">
       <h3 class="prayer-name">${escapeHtml(prayer.name)}</h3>
       <p class="prayer-ar">${escapeHtml(prayer.ar)}</p>
-      <div class="prayer-time">${escapeHtml(prayer.time)}</div>
+      <div class="prayer-time">${escapeHtml(formatTime(prayer.time))}</div>
     </div>
   `).join('');
 
@@ -201,7 +290,7 @@ function displayNextPrayer(data) {
         <div class="next-prayer-label">Upcoming Prayer</div>
         <div class="next-prayer-name">${escapeHtml(nextPrayer.name)}</div>
         <div class="next-prayer-ar">${escapeHtml(nextPrayer.ar)}</div>
-        <div class="next-prayer-time">${escapeHtml(nextPrayer.time)}</div>
+        <div class="next-prayer-time">${escapeHtml(formatTime(nextPrayer.time))}</div>
         <div class="time-remaining">
           <span>${escapeHtml(timeRemaining)}</span>
         </div>
