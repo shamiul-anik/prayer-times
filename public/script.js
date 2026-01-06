@@ -14,6 +14,41 @@ const adhanStatus = document.getElementById('adhanStatus');
 let currentPrayerTimes = {};
 let lastPlayedPrayer = null;
 
+// Define city-country mapping
+const cityCountryMap = {
+  "Japan": ["Osaka", "Tokyo"],
+  "UK": ["London"],
+  "UAE": ["Dubai"],
+  "Turkey": ["Istanbul"],
+  "Egypt": ["Cairo"],
+  "Saudi Arabia": ["Medina", "Mecca"]
+};
+
+// Function to update city options based on selected country
+function updateCityOptions() {
+  const selectedCountry = countrySelect.value;
+  const cities = cityCountryMap[selectedCountry] || [];
+
+  // Clear existing city options
+  citySelect.innerHTML = '';
+
+  // Add new city options
+  cities.forEach(city => {
+    const option = document.createElement('option');
+    option.value = city;
+    option.textContent = city;
+    citySelect.appendChild(option);
+  });
+
+  // Select the first city or a previously saved one
+  const savedCity = localStorage.getItem('prayer-times-city');
+  if (savedCity && cities.includes(savedCity)) {
+    citySelect.value = savedCity;
+  } else if (cities.length > 0) {
+    citySelect.value = cities[0];
+  }
+}
+
 // Get cache key with date to ensure daily refresh
 function getCacheKey(city, country, school) {
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
@@ -42,7 +77,11 @@ function formatTime(time24) {
 
 // Event Listeners
 citySelect.addEventListener('change', loadPrayerTimes);
-countrySelect.addEventListener('change', loadPrayerTimes);
+countrySelect.addEventListener('change', () => {
+  localStorage.setItem('prayer-times-country', countrySelect.value);
+  updateCityOptions();
+  loadPrayerTimes();
+});
 schoolSelect.addEventListener('change', loadPrayerTimes);
 
 // Add event listener for timing select if element exists
@@ -63,7 +102,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (timingSelect && localStorage.getItem('prayer-times-timing')) {
     timingSelect.value = localStorage.getItem('prayer-times-timing');
   }
-  
+
+  // Restore country preference from localStorage
+  if (countrySelect && localStorage.getItem('prayer-times-country')) {
+    countrySelect.value = localStorage.getItem('prayer-times-country');
+  }
+
+  updateCityOptions(); // Initialize city options based on selected country
   loadPrayerTimes();
   startClockUpdate();
   startAutoRefresh();
