@@ -76,13 +76,19 @@ function formatTime(time24) {
 }
 
 // Event Listeners
-citySelect.addEventListener('change', loadPrayerTimes);
+citySelect.addEventListener('change', () => {
+  localStorage.setItem('prayer-times-city', citySelect.value);
+  loadPrayerTimes();
+});
 countrySelect.addEventListener('change', () => {
   localStorage.setItem('prayer-times-country', countrySelect.value);
   updateCityOptions();
   loadPrayerTimes();
 });
-schoolSelect.addEventListener('change', loadPrayerTimes);
+schoolSelect.addEventListener('change', () => {
+  localStorage.setItem('prayer-times-school', schoolSelect.value);
+  loadPrayerTimes();
+});
 
 // Add event listener for timing select if element exists
 if (timingSelect) {
@@ -108,7 +114,18 @@ document.addEventListener('DOMContentLoaded', () => {
     countrySelect.value = localStorage.getItem('prayer-times-country');
   }
 
+  // Restore school preference from localStorage
+  if (schoolSelect && localStorage.getItem('prayer-times-school')) {
+    schoolSelect.value = localStorage.getItem('prayer-times-school');
+  }
+
   updateCityOptions(); // Initialize city options based on selected country
+
+  // Restore city preference from localStorage after options are updated
+  if (citySelect && localStorage.getItem('prayer-times-city')) {
+    citySelect.value = localStorage.getItem('prayer-times-city');
+  }
+  
   loadPrayerTimes();
   startClockUpdate();
   startAutoRefresh();
@@ -162,8 +179,7 @@ function clearOldCache() {
 
 // Auto refresh prayer times every 12 hours (43200000 ms)
 function startAutoRefresh() {
-  // Clear old cache immediately and then every hour
-  clearOldCache();
+  // Clear old cache every hour
   setInterval(clearOldCache, 60 * 60 * 1000); // Every hour
   
   // Refresh prayer times every 12 hours
