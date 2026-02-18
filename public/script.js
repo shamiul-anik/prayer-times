@@ -135,6 +135,62 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Ramadan Timetable Logic
+const ramadanTimeColumns = [
+  "Suhoor End",
+  "Fajr",
+  "Sunrise",
+  "Zuhr",
+  "Ashar",
+  "Maghrib",
+  "Iftar Start",
+  "Isha",
+];
+
+function getRamadanTimeOffsetMinutes() {
+  return citySelect && citySelect.value === "Tokyo" ? -17 : 0;
+}
+
+function shiftTimeByMinutes(timeString, offsetMinutes) {
+  if (!timeString || !offsetMinutes) return timeString;
+
+  const match = timeString.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return timeString;
+
+  const originalHourText = match[1];
+  const hour12 = Number(match[1]);
+  const minute = Number(match[2]);
+  const period = match[3].toUpperCase();
+
+  let hour24 = hour12 % 12;
+  if (period === "PM") hour24 += 12;
+
+  let totalMinutes = hour24 * 60 + minute + offsetMinutes;
+  totalMinutes = ((totalMinutes % 1440) + 1440) % 1440;
+
+  const shiftedHour24 = Math.floor(totalMinutes / 60);
+  const shiftedMinute = totalMinutes % 60;
+  const shiftedPeriod = shiftedHour24 >= 12 ? "PM" : "AM";
+  const shiftedHour12 = shiftedHour24 % 12 || 12;
+
+  const useTwoDigitHour = originalHourText.length === 2;
+  const hourText = useTwoDigitHour
+    ? String(shiftedHour12).padStart(2, "0")
+    : String(shiftedHour12);
+
+  return `${hourText}:${String(shiftedMinute).padStart(2, "0")} ${shiftedPeriod}`;
+}
+
+function getAdjustedRamadanDay(day) {
+  const offsetMinutes = getRamadanTimeOffsetMinutes();
+  if (!offsetMinutes) return day;
+
+  const adjustedDay = { ...day };
+  ramadanTimeColumns.forEach((column) => {
+    adjustedDay[column] = shiftTimeByMinutes(day[column], offsetMinutes);
+  });
+  return adjustedDay;
+}
+
 function updateRamadanTitles(currentDayDate = "") {
   const highlightTitle = document.getElementById("RamadanHighlightTitle");
   const fullTitle = document.getElementById("RamadanFullTitle");
@@ -164,20 +220,23 @@ function initRamadanTimetable() {
   // Populate Full Timetable
   tableBody.innerHTML = RamadanTimetable2026
     .map(
-      (day) => `
+      (day) => {
+        const adjustedDay = getAdjustedRamadanDay(day);
+        return `
     <tr class="${isCurrentRamadanDay(day) ? "current-day" : ""}">
-      <td>${day.Day}</td>
-      <td>${day.Date}</td>
-      <td>${day["Suhoor End"]}</td>
-      <td>${day.Fajr}</td>
-      <td>${day.Sunrise}</td>
-      <td>${day.Zuhr}</td>
-      <td>${day.Ashar}</td>
-      <td>${day.Maghrib}</td>
-      <td>${day["Iftar Start"]}</td>
-      <td>${day.Isha}</td>
+      <td>${adjustedDay.Day}</td>
+      <td>${adjustedDay.Date}</td>
+      <td>${adjustedDay["Suhoor End"]}</td>
+      <td>${adjustedDay.Fajr}</td>
+      <td>${adjustedDay.Sunrise}</td>
+      <td>${adjustedDay.Zuhr}</td>
+      <td>${adjustedDay.Ashar}</td>
+      <td>${adjustedDay.Maghrib}</td>
+      <td>${adjustedDay["Iftar Start"]}</td>
+      <td>${adjustedDay.Isha}</td>
     </tr>
-  `,
+  `;
+      },
     )
     .join("");
   fullSection.style.display = "block";
@@ -185,31 +244,32 @@ function initRamadanTimetable() {
   // Find and Populate Current Day Highlight
   const currentDay = findCurrentRamadanDay();
   if (currentDay) {
+    const adjustedCurrentDay = getAdjustedRamadanDay(currentDay);
     updateRamadanTitles(currentDay.Date);
     container.innerHTML = `
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Day</div>
-        <div class="Ramadan-item-value">${currentDay.Day}</div>
+        <div class="Ramadan-item-value">${adjustedCurrentDay.Day}</div>
       </div>
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Date</div>
-        <div class="Ramadan-item-value">${currentDay.Date}</div>
+        <div class="Ramadan-item-value">${adjustedCurrentDay.Date}</div>
       </div>
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Suhoor End</div>
-        <div class="Ramadan-item-value">${currentDay["Suhoor End"]}</div>
+        <div class="Ramadan-item-value">${adjustedCurrentDay["Suhoor End"]}</div>
       </div>
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Fajr</div>
-        <div class="Ramadan-item-value">${currentDay.Fajr}</div>
+        <div class="Ramadan-item-value">${adjustedCurrentDay.Fajr}</div>
       </div>
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Maghrib</div>
-        <div class="Ramadan-item-value">${currentDay.Maghrib}</div>
+        <div class="Ramadan-item-value">${adjustedCurrentDay.Maghrib}</div>
       </div>
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Iftar Start</div>
-        <div class="Ramadan-item-value">${currentDay["Iftar Start"]}</div>
+        <div class="Ramadan-item-value">${adjustedCurrentDay["Iftar Start"]}</div>
       </div>
     `;
     highlightSection.style.display = "block";

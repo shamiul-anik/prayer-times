@@ -1,5 +1,5 @@
 // Service Worker for Prayer Times PWA
-const CACHE_NAME = "prayer-times-v2";
+const CACHE_NAME = "prayer-times-v3";
 const STATIC_ASSETS = ["/", "/index.html", "/style.css", "/script.js", "/pwa.js", "/manifest.json", "/audio/a1.mp3"];
 
 // Install event - cache essential files
@@ -100,8 +100,8 @@ self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SHOW_NOTIFICATION") {
     const options = {
       body: event.data.body || "Prayer time notification",
-      icon: "/icons/icon-192x192.png",
-      badge: "/icons/icon-72x72.png",
+      icon: "/icons/icon.svg",
+      badge: "/icons/icon.svg",
       tag: "prayer-time",
       requireInteraction: true,
       data: {

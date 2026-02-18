@@ -134,8 +134,8 @@ class PrayerTimesPWA {
 
     this.swRegistration.showNotification('Prayer Times Dashboard', {
       body: 'Notifications enabled! You will receive Adhan alerts for prayer times.',
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-72x72.png',
+      icon: '/icons/icon.svg',
+      badge: '/icons/icon.svg',
       tag: 'welcome',
       data: {
         dateOfArrival: Date.now()
@@ -161,8 +161,8 @@ class PrayerTimesPWA {
 
     const notificationOptions = {
       body: `It's time for ${prayer.name} prayer at ${formattedTime}`,
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-72x72.png',
+      icon: '/icons/icon.svg',
+      badge: '/icons/icon.svg',
       tag: 'prayer-time',
       requireInteraction: false,
       vibrate: [200, 100, 200],
@@ -230,8 +230,8 @@ class PrayerTimesPWA {
 
     this.swRegistration.showNotification('App Update Available', {
       body: 'A new version of Prayer Times is available. Please refresh the app.',
-      icon: '/icons/icon-192x192.png',
-      badge: '/icons/icon-72x72.png',
+      icon: '/icons/icon.svg',
+      badge: '/icons/icon.svg',
       tag: 'update',
       requireInteraction: true,
       data: {
