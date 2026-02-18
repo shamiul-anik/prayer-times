@@ -381,20 +381,39 @@ class PrayerTimesPWA {
     container.remove();
   }
 
+  getInstallPromptTheme() {
+    const styles = getComputedStyle(document.documentElement);
+    const read = (name, fallback) => {
+      const value = styles.getPropertyValue(name);
+      return value ? value.trim() : fallback;
+    };
+
+    return {
+      background: read('--primary-dark', '#1a1f3a'),
+      text: read('--text-primary', '#f0f4ff'),
+      buttonBg: read('--text-primary', '#f0f4ff'),
+      buttonText: read('--primary-dark', '#1a1f3a'),
+      buttonHover: read('--text-secondary', '#a0aec0'),
+      closeBg: 'rgba(255,255,255,0.2)',
+      closeHover: 'rgba(255,255,255,0.3)',
+    };
+  }
+
   // Create manual install banner for browsers without beforeinstallprompt
   createManualInstallBanner() {
     if (document.getElementById('installPrompt')) {
       return;
     }
 
+    const theme = this.getInstallPromptTheme();
     const banner = document.createElement('div');
     banner.id = 'installPrompt';
     banner.style.cssText = `
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #1b4332;
-      color: white;
+      background: ${theme.background};
+      color: ${theme.text};
       padding: 16px 20px;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -429,8 +448,8 @@ class PrayerTimesPWA {
     const button = document.createElement('button');
     button.textContent = 'How to Install';
     button.style.cssText = `
-      background: white;
-      color: #1b4332;
+      background: ${theme.buttonBg};
+      color: ${theme.buttonText};
       border: none;
       padding: 8px 12px;
       border-radius: 4px;
@@ -442,20 +461,20 @@ class PrayerTimesPWA {
     `;
 
     button.addEventListener('mouseover', () => {
-      button.style.background = '#f0f0f0';
+      button.style.background = theme.buttonHover;
     });
 
     button.addEventListener('mouseout', () => {
-      button.style.background = 'white';
+      button.style.background = theme.buttonBg;
     });
 
     const closeBtn = document.createElement('button');
-    closeBtn.textContent = '×';
+    closeBtn.textContent = 'x';
     closeBtn.className = 'close-btn';
     closeBtn.style.cssText = `
-      background: rgba(255,255,255,0.2);
+      background: ${theme.closeBg};
       border: none;
-      color: white;
+      color: ${theme.text};
       width: 32px;
       height: 32px;
       border-radius: 4px;
@@ -465,11 +484,11 @@ class PrayerTimesPWA {
     `;
 
     closeBtn.addEventListener('mouseover', () => {
-      closeBtn.style.background = 'rgba(255,255,255,0.3)';
+      closeBtn.style.background = theme.closeHover;
     });
 
     closeBtn.addEventListener('mouseout', () => {
-      closeBtn.style.background = 'rgba(255,255,255,0.2)';
+      closeBtn.style.background = theme.closeBg;
     });
 
     button.addEventListener('click', () => this.showInstallInstructions());
@@ -480,7 +499,6 @@ class PrayerTimesPWA {
     banner.appendChild(closeBtn);
     document.body.appendChild(banner);
   }
-
   // Create install banner automatically if no container exists
   createInstallBanner(deferredPrompt) {
     // Check if banner already exists
@@ -488,14 +506,15 @@ class PrayerTimesPWA {
       return;
     }
 
+    const theme = this.getInstallPromptTheme();
     const banner = document.createElement('div');
     banner.id = 'installPrompt';
     banner.style.cssText = `
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #1b4332;
-      color: white;
+      background: ${theme.background};
+      color: ${theme.text};
       padding: 16px 20px;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -525,14 +544,14 @@ class PrayerTimesPWA {
     document.head.appendChild(style);
 
     const text = document.createElement('span');
-    text.textContent = "🕌 Install Prayer Times App";
+    text.textContent = "\u{1F54C} Install Prayer Times App";
     text.style.flex = '1';
 
     const button = document.createElement('button');
     button.textContent = 'Install';
     button.style.cssText = `
-      background: white;
-      color: #1b4332;
+      background: ${theme.buttonBg};
+      color: ${theme.buttonText};
       border: none;
       padding: 8px 16px;
       border-radius: 4px;
@@ -543,20 +562,20 @@ class PrayerTimesPWA {
     `;
 
     button.addEventListener('mouseover', () => {
-      button.style.background = '#f0f0f0';
+      button.style.background = theme.buttonHover;
     });
 
     button.addEventListener('mouseout', () => {
-      button.style.background = 'white';
+      button.style.background = theme.buttonBg;
     });
 
     const closeBtn = document.createElement('button');
-    closeBtn.textContent = '✕';
+    closeBtn.textContent = 'x';
     closeBtn.className = 'close-btn';
     closeBtn.style.cssText = `
-      background: rgba(255,255,255,0.2);
+      background: ${theme.closeBg};
       border: none;
-      color: white;
+      color: ${theme.text};
       width: 32px;
       height: 32px;
       border-radius: 4px;
@@ -566,17 +585,17 @@ class PrayerTimesPWA {
     `;
 
     closeBtn.addEventListener('mouseover', () => {
-      closeBtn.style.background = 'rgba(255,255,255,0.3)';
+      closeBtn.style.background = theme.closeHover;
     });
 
     closeBtn.addEventListener('mouseout', () => {
-      closeBtn.style.background = 'rgba(255,255,255,0.2)';
+      closeBtn.style.background = theme.closeBg;
     });
 
     button.addEventListener('click', () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
-        
+
         deferredPrompt.userChoice.then((choiceResult) => {
           if (choiceResult.outcome === 'accepted') {
             console.log('✓ User accepted the install prompt');
@@ -639,3 +658,4 @@ if (document.readyState === 'loading') {
 
 // Expose globally for use in other scripts
 window.pwaInstance = pwaInstance;
+
