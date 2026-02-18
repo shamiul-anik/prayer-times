@@ -64,7 +64,7 @@ function escapeHtml(text) {
 
 // Utility function to format time based on selected format
 function formatTime(time24) {
-  const format = timingSelect && timingSelect.value ? timingSelect.value : "24";
+  const format = timingSelect && timingSelect.value ? timingSelect.value : "12";
   const [hours, minutes] = time24.split(":").map(Number);
 
   if (format === "12") {
