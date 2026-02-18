@@ -243,10 +243,12 @@ class PrayerTimesPWA {
   // Handle install prompt
   handleInstallPrompt() {
     let deferredPrompt = null;
+    let installPromptAvailable = false;
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Don't prevent default - let browser handle it
-      // We'll show our custom banner alongside the browser's
+      // Capture and defer prompt for a consistent custom install banner.
+      e.preventDefault();
+      installPromptAvailable = true;
       deferredPrompt = e;
       console.log('Install prompt is available');
       
@@ -264,6 +266,63 @@ class PrayerTimesPWA {
       const banner = document.getElementById('installPrompt');
       if (banner) banner.remove();
     });
+
+    // iOS Safari and macOS Safari often don't fire beforeinstallprompt.
+    setTimeout(() => {
+      if (!installPromptAvailable && !this.isRunningStandalone()) {
+        this.showManualInstallPrompt();
+      }
+    }, 1200);
+  }
+
+  isRunningStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  isIOSSafari() {
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isWebKit = /WebKit/.test(ua);
+    const isOtherIOSBrowser = /CriOS|FxiOS|EdgiOS/.test(ua);
+    return isIOS && isWebKit && !isOtherIOSBrowser;
+  }
+
+  isMacSafari() {
+    const ua = navigator.userAgent;
+    const isMac = /Macintosh/.test(ua);
+    const isSafari = /Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua);
+    return isMac && isSafari;
+  }
+
+  showManualInstallPrompt() {
+    const installContainer = document.getElementById('installPrompt');
+
+    if (installContainer) {
+      installContainer.style.display = 'block';
+      const installButton = installContainer.querySelector('button');
+      if (installButton) {
+        installButton.textContent = 'How to Install';
+        installButton.removeEventListener('click', this.handleInstallClick);
+        installButton.addEventListener('click', () => this.showInstallInstructions());
+      }
+      return;
+    }
+
+    this.createManualInstallBanner();
+  }
+
+  showInstallInstructions() {
+    if (this.isIOSSafari()) {
+      alert("iPhone/iPad: Tap Share, then choose 'Add to Home Screen'.");
+      return;
+    }
+
+    if (this.isMacSafari()) {
+      alert("Mac Safari: Use File > Add to Dock to install this app.");
+      return;
+    }
+
+    alert("Use your browser menu and choose 'Install app' or 'Add to Home Screen'.");
   }
 
   // Show install prompt
@@ -322,6 +381,106 @@ class PrayerTimesPWA {
     container.remove();
   }
 
+  // Create manual install banner for browsers without beforeinstallprompt
+  createManualInstallBanner() {
+    if (document.getElementById('installPrompt')) {
+      return;
+    }
+
+    const banner = document.createElement('div');
+    banner.id = 'installPrompt';
+    banner.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1b4332;
+      color: white;
+      padding: 16px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      z-index: 9999;
+      max-width: 320px;
+      animation: slideIn 0.3s ease-out;
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    const text = document.createElement('span');
+    text.textContent = 'Install Prayer Times App';
+    text.style.flex = '1';
+
+    const button = document.createElement('button');
+    button.textContent = 'How to Install';
+    button.style.cssText = `
+      background: white;
+      color: #1b4332;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    `;
+
+    button.addEventListener('mouseover', () => {
+      button.style.background = '#f0f0f0';
+    });
+
+    button.addEventListener('mouseout', () => {
+      button.style.background = 'white';
+    });
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.className = 'close-btn';
+    closeBtn.style.cssText = `
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.2s;
+    `;
+
+    closeBtn.addEventListener('mouseover', () => {
+      closeBtn.style.background = 'rgba(255,255,255,0.3)';
+    });
+
+    closeBtn.addEventListener('mouseout', () => {
+      closeBtn.style.background = 'rgba(255,255,255,0.2)';
+    });
+
+    button.addEventListener('click', () => this.showInstallInstructions());
+    closeBtn.addEventListener('click', () => banner.remove());
+
+    banner.appendChild(text);
+    banner.appendChild(button);
+    banner.appendChild(closeBtn);
+    document.body.appendChild(banner);
+  }
+
   // Create install banner automatically if no container exists
   createInstallBanner(deferredPrompt) {
     // Check if banner already exists
@@ -366,7 +525,7 @@ class PrayerTimesPWA {
     document.head.appendChild(style);
 
     const text = document.createElement('span');
-    text.textContent = '📱 Install Prayer Times App';
+    text.textContent = "🕌 Install Prayer Times App";
     text.style.flex = '1';
 
     const button = document.createElement('button');
