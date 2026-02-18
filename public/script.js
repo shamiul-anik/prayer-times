@@ -199,7 +199,7 @@ function updateRamadanTitles(currentDayDate = "") {
   const baseTitle = `Ramadan Timetable 2026 - ${city}, ${country}`;
 
   if (highlightTitle) {
-    highlightTitle.textContent = `🕌 Next Ramadan - ${city}, ${country}`;
+    highlightTitle.textContent = `🌙 Next Day's Ramadan Timetable - ${city}, ${country}`;
   }
 
   if (fullTitle) {
