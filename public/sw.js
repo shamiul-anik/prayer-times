@@ -42,6 +42,14 @@ self.addEventListener("activate", (event) => {
 
 // Fetch event - network first, fall back to cache
 self.addEventListener("fetch", (event) => {
+  const requestUrl = new URL(event.request.url);
+  const isHttpRequest =
+    requestUrl.protocol === "http:" || requestUrl.protocol === "https:";
+
+  if (!isHttpRequest || event.request.method !== "GET") {
+    return;
+  }
+
   // Handle API requests with network-first strategy
   if (event.request.url.includes("/api/")) {
     event.respondWith(

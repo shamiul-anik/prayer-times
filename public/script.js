@@ -285,6 +285,7 @@ function findCurrentRamadanDay() {
   const monthShort = now.toLocaleString("en-US", { month: "short" });
 
   return RamadanTimetable2026.find((item) => {
+    if (!item || typeof item.Date !== "string") return false;
     return (
       item.Date.includes(`${day} ${month}`) ||
       item.Date.includes(`${day} ${monthShort}`)

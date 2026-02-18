@@ -80,9 +80,10 @@ class PrayerTimesPWA {
       
       // Register for periodic background sync (if supported)
       // Note: This requires HTTPS and user engagement
-      if ('periodicSync' in this.swRegistration) {
+      const activeRegistration = await navigator.serviceWorker.ready;
+      if (activeRegistration && 'periodicSync' in activeRegistration) {
         try {
-          await this.swRegistration.periodicSync.register('prayer-times-periodic', {
+          await activeRegistration.periodicSync.register('prayer-times-periodic', {
             minInterval: 24 * 60 * 60 * 1000 // 24 hours
           });
           console.log('✓ Periodic sync registered');
@@ -246,8 +247,7 @@ class PrayerTimesPWA {
     let installPromptAvailable = false;
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Capture and defer prompt for a consistent custom install banner.
-      e.preventDefault();
+      // Capture install prompt event for browsers that support it.
       installPromptAvailable = true;
       deferredPrompt = e;
       console.log('Install prompt is available');
