@@ -79,11 +79,13 @@ function formatTime(time24) {
 citySelect.addEventListener("change", () => {
   localStorage.setItem("prayer-times-city", citySelect.value);
   loadPrayerTimes();
+  initRamadanTimetable();
 });
 countrySelect.addEventListener("change", () => {
   localStorage.setItem("prayer-times-country", countrySelect.value);
   updateCityOptions();
   loadPrayerTimes();
+  initRamadanTimetable();
 });
 schoolSelect.addEventListener("change", () => {
   localStorage.setItem("prayer-times-school", schoolSelect.value);
@@ -133,12 +135,29 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Ramadan Timetable Logic
+function updateRamadanTitles(currentDayDate = "") {
+  const highlightTitle = document.getElementById("RamadanHighlightTitle");
+  const fullTitle = document.getElementById("RamadanFullTitle");
+  const city = citySelect ? citySelect.value : "Osaka";
+  const country = countrySelect ? countrySelect.value : "Japan";
+  const baseTitle = `Ramadan Timetable 2026 - ${city}, ${country}`;
+
+  if (highlightTitle) {
+    highlightTitle.textContent = currentDayDate
+      ? `${baseTitle} (Date ${currentDayDate})`
+      : baseTitle;
+  }
+
+  if (fullTitle) {
+    fullTitle.textContent = baseTitle;
+  }
+}
+
 function initRamadanTimetable() {
   const container = document.getElementById("RamadanHighlightContainer");
   const tableBody = document.getElementById("RamadanFullTableBody");
   const highlightSection = document.getElementById("RamadanHighlightSection");
   const fullSection = document.getElementById("RamadanFullSection");
-  const highlightTitle = document.getElementById("RamadanHighlightTitle");
 
   if (!RamadanTimetable2026 || RamadanTimetable2026.length === 0) return;
 
@@ -166,7 +185,7 @@ function initRamadanTimetable() {
   // Find and Populate Current Day Highlight
   const currentDay = findCurrentRamadanDay();
   if (currentDay) {
-    highlightTitle.textContent = `Ramadan Timetable 2026 - Osaka, Japan (Date ${currentDay.Date})`;
+    updateRamadanTitles(currentDay.Date);
     container.innerHTML = `
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Day</div>
@@ -194,6 +213,8 @@ function initRamadanTimetable() {
       </div>
     `;
     highlightSection.style.display = "block";
+  } else {
+    updateRamadanTitles();
   }
 }
 
