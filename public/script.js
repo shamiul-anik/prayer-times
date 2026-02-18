@@ -199,9 +199,7 @@ function updateRamadanTitles(currentDayDate = "") {
   const baseTitle = `Ramadan Timetable 2026 - ${city}, ${country}`;
 
   if (highlightTitle) {
-    highlightTitle.textContent = currentDayDate
-      ? `${baseTitle} (Date ${currentDayDate})`
-      : baseTitle;
+    highlightTitle.textContent = `🕌 Next Ramadan - ${city}, ${country}`;
   }
 
   if (fullTitle) {
@@ -241,41 +239,87 @@ function initRamadanTimetable() {
     .join("");
   fullSection.style.display = "block";
 
-  // Find and Populate Current Day Highlight
-  const currentDay = findCurrentRamadanDay();
-  if (currentDay) {
-    const adjustedCurrentDay = getAdjustedRamadanDay(currentDay);
-    updateRamadanTitles(currentDay.Date);
+  // Find and Populate Next Ramadan Highlight
+  const nextDay = findNextRamadanDay();
+  if (nextDay) {
+    const adjustedNextDay = getAdjustedRamadanDay(nextDay);
+    updateRamadanTitles(nextDay.Date);
     container.innerHTML = `
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Day</div>
-        <div class="Ramadan-item-value">${adjustedCurrentDay.Day}</div>
+        <div class="Ramadan-item-value">${adjustedNextDay.Day}</div>
       </div>
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Date</div>
-        <div class="Ramadan-item-value">${adjustedCurrentDay.Date}</div>
+        <div class="Ramadan-item-value">${adjustedNextDay.Date}</div>
       </div>
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Suhoor End</div>
-        <div class="Ramadan-item-value">${adjustedCurrentDay["Suhoor End"]}</div>
+        <div class="Ramadan-item-value">${adjustedNextDay["Suhoor End"]}</div>
       </div>
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Fajr</div>
-        <div class="Ramadan-item-value">${adjustedCurrentDay.Fajr}</div>
+        <div class="Ramadan-item-value">${adjustedNextDay.Fajr}</div>
       </div>
       <div class="Ramadan-item">
         <div class="Ramadan-item-label">Maghrib</div>
-        <div class="Ramadan-item-value">${adjustedCurrentDay.Maghrib}</div>
+        <div class="Ramadan-item-value">${adjustedNextDay.Maghrib}</div>
       </div>
       <div class="Ramadan-item">
-        <div class="Ramadan-item-label">Iftar Start</div>
-        <div class="Ramadan-item-value">${adjustedCurrentDay["Iftar Start"]}</div>
+        <div class="Ramadan-item-label">Iftar</div>
+        <div class="Ramadan-item-value">${adjustedNextDay["Iftar Start"]}</div>
       </div>
     `;
     highlightSection.style.display = "block";
   } else {
     updateRamadanTitles();
   }
+}
+
+function parseRamadanDate(dateText) {
+  if (!dateText || typeof dateText !== "string") return null;
+
+  const parts = dateText.trim().split(/\s+/);
+  if (parts.length < 2) return null;
+
+  const day = Number(parts[0]);
+  if (Number.isNaN(day)) return null;
+
+  const monthMap = {
+    January: 0, Jan: 0,
+    February: 1, Feb: 1,
+    March: 2, Mar: 2,
+    April: 3, Apr: 3,
+    May: 4,
+    June: 5, Jun: 5,
+    July: 6, Jul: 6,
+    August: 7, Aug: 7,
+    September: 8, Sep: 8,
+    October: 9, Oct: 9,
+    November: 10, Nov: 10,
+    December: 11, Dec: 11,
+  };
+
+  const month = monthMap[parts[1]];
+  if (month === undefined) return null;
+
+  // Ramadan timetable year in this dataset.
+  return new Date(2026, month, day);
+}
+
+function findNextRamadanDay() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (const item of RamadanTimetable2026) {
+    if (!item || typeof item.Date !== "string") continue;
+    const itemDate = parseRamadanDate(item.Date);
+    if (itemDate && itemDate >= today) {
+      return item;
+    }
+  }
+
+  return RamadanTimetable2026.find((item) => item && typeof item.Date === "string");
 }
 
 function findCurrentRamadanDay() {

@@ -296,6 +296,10 @@ body {
   text-align: center;
 }
 
+#RamadanHighlightTitle {
+  color: var(--accent-light);
+}
+
 .Ramadan-highlight-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -501,6 +505,21 @@ tr.current-day td {
   .next-prayer-time {
     font-size: 2em;
   }
+
+  .Ramadan-highlight-section,
+  .Ramadan-full-section {
+    padding: 18px;
+    margin-bottom: 22px;
+  }
+
+  .Ramadan-highlight-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .Ramadan-item {
+    padding: 13px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -573,6 +592,29 @@ tr.current-day td {
 
   .next-prayer-time {
     font-size: 2em;
+  }
+
+  .Ramadan-highlight-section,
+  .Ramadan-full-section {
+    padding: 14px;
+    margin-bottom: 18px;
+  }
+
+  .Ramadan-highlight-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .Ramadan-item {
+    padding: 10px;
+  }
+
+  .Ramadan-item-label {
+    font-size: 0.72em;
+  }
+
+  .Ramadan-item-value {
+    font-size: 1.15em;
   }
 
   .adhan-section {
